@@ -48,7 +48,9 @@ public class KeyboardManager extends Thread {
                 s.stop();
                 continue;
             } else {
-                System.out.println("input non riconosciuto");
+                Util.errorMessage("input non riconosciuto");
+                scanner.nextLine();
+                Util.clearConsole();
             }
         }
 
