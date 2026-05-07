@@ -25,6 +25,7 @@ public class KeyboardManager extends Thread {
                     input = scanner.nextLine();
                     if (!input.matches("[a-zA-Z]+")) {
                         Util.errorMessage("inserisci solo caratteri dell'alfabeto");
+                        scanner.nextLine();
                         continue;
                     }
                     Util.clearConsole();
@@ -34,6 +35,8 @@ public class KeyboardManager extends Thread {
                         quantitaS = scanner.nextLine();
                         if (!quantitaS.matches("\\d+")) {
                             Util.errorMessage("inserisci solo numeri");
+                            scanner.nextLine();
+                            quantitaS = "";
                         }
                         Util.clearConsole();
                     }
