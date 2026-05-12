@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
+import com.google.gson.Gson;
+import models.dto.Login;
+import models.dto.Area;
 
 public class Main {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         String serverUrl = dotenv.get("SERVER_URL");
         int port = Integer.parseInt(dotenv.get("PORT"));
+        Gson gson = new Gson();
 
         Scanner scanner = new Scanner(System.in);
 
@@ -19,7 +23,9 @@ public class Main {
 
             System.out.print("Inserisci lo username: ");
             String username = scanner.nextLine();
-            output.writeUTF(username);
+            
+            Login loginDto = new Login(username);
+            output.writeUTF(gson.toJson(loginDto));
 
             String confirmedArea;
             String serverResponse = input.readUTF();
@@ -31,7 +37,9 @@ public class Main {
                 System.out.print("Scrivi il nome dell'area tra quelle elencate: ");
                 String areaName = scanner.nextLine();
                 
-                output.writeUTF(areaName);
+                Area areaDto = new Area(areaName);
+                output.writeUTF(gson.toJson(areaDto));
+                
                 confirmedArea = input.readUTF();
             } else {
                 confirmedArea = serverResponse;
@@ -62,6 +70,9 @@ public class Main {
 
         } catch (IOException | InterruptedException e) {
             System.err.println("Errore di connessione o comunicazione: " + e.getMessage());
+        } finally {
+            scanner.close();
         }
+
     }
 }
