@@ -11,33 +11,57 @@ import models.dto.Area;
 public class Main {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
+        
+        // Parsing e validazione dei dati dal .env
         String serverUrl = dotenv.get("SERVER_URL");
-        int port = Integer.parseInt(dotenv.get("PORT"));
+        String portStr = dotenv.get("PORT");
+
+        if (serverUrl == null || portStr == null || serverUrl.isEmpty()) {
+            System.err.println("Errore: Variabili SERVER_URL o PORT mancanti nel file .env");
+            return;
+        }
+
+        int port;
+        try {
+            port = Integer.parseInt(portStr);
+        } catch (NumberFormatException e) {
+            System.err.println("Errore: Il valore della PORT nel file .env non è un numero valido");
+            return;
+        }
+
         Gson gson = new Gson();
-
         Scanner scanner = new Scanner(System.in);
+        System.out.println("--- FastEat: Applicativo Cliente ---");
 
-        try (Socket socket = new Socket(serverUrl, port);
-             DataInputStream input = new DataInputStream(socket.getInputStream());
-             DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-
-            System.out.print("Inserisci lo username: ");
-            String username = scanner.nextLine();
+        // Try-with-resources solo per la Socket
+        try (Socket socket = new Socket(serverUrl, port)) {
             
-            Login loginDto = new Login(username);
+            // Inizializzazione manuale degli stream
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            
+            System.out.println("Connessione al server stabilita.");
+
+            System.out.print("Inserisci lo username per il login: ");
+            String usernameInput = scanner.nextLine();
+            
+            // Invio DTO Login via JSON
+            Login loginDto = new Login(usernameInput);
             output.writeUTF(gson.toJson(loginDto));
 
             String confirmedArea;
             String serverResponse = input.readUTF();
 
+            // Logica di gestione area mancante
             if (serverResponse.equals("NEED_AREA")) {
                 String areaList = input.readUTF();
                 System.out.println("Aree disponibili:\n" + areaList);
                 
-                System.out.print("Scrivi il nome dell'area tra quelle elencate: ");
-                String areaName = scanner.nextLine();
+                System.out.print("Scrivi il nome dell'area scelta: ");
+                String selectedArea = scanner.nextLine();
                 
-                Area areaDto = new Area(areaName);
+                // Invio DTO Area via JSON
+                Area areaDto = new Area(selectedArea);
                 output.writeUTF(gson.toJson(areaDto));
                 
                 confirmedArea = input.readUTF();
@@ -47,32 +71,28 @@ public class Main {
 
             System.out.println("Accesso eseguito nell'area: " + confirmedArea);
 
+            // Creazione storage e passaggio ai thread tramite costruttore
             Storage storage = new Storage();
-            storage.setUserName(username);
+            storage.setUserName(usernameInput);
             storage.setUserArea(confirmedArea);
 
             Reciever receiver = new Reciever();
-            receiver.s = storage;
-            
             Sender sender = new Sender();
-            sender.s = storage;
-            
             KeyboardManager keyboardManager = new KeyboardManager();
-            keyboardManager.s = storage;
 
             receiver.start();
             sender.start();
             keyboardManager.start();
 
+            // Join per mantenere il socket aperto finché i thread lavorano
             receiver.join();
             sender.join();
             keyboardManager.join();
 
         } catch (IOException | InterruptedException e) {
-            System.err.println("Errore di connessione o comunicazione: " + e.getMessage());
+            System.err.println("Errore durante l'esecuzione: " + e.getMessage());
         } finally {
             scanner.close();
         }
-
     }
 }
