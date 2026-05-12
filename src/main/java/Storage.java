@@ -1,5 +1,7 @@
 import java.util.Vector;
 
+import models.dto.Prodotto;
+
 public class Storage {
     private boolean isRunning = true;
     private OrderStates state;
