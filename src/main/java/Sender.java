@@ -17,7 +17,7 @@ public class Sender extends Thread {
         this.gson = new Gson();
     }
 
-    public Sender(Storage storage) {
+    public Sender(Storage storage, Socket socket) {
         s = storage;
     }
 

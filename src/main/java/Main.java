@@ -15,15 +15,17 @@ public class Main {
         String serverUrl = dotenv.get("SERVER_URL");
         String portStr = dotenv.get("PORT");
 
-        if (serverUrl == null || portStr == null || serverUrl.isEmpty()) {
-            return;
+        int port = 8080; 
+        if (serverUrl == null || serverUrl.isEmpty()) {
+            serverUrl = "localhost";
         }
-
-        int port;
+        
         try {
-            port = Integer.parseInt(portStr);
+            if (portStr != null) {
+                port = Integer.parseInt(portStr);
+            }
         } catch (NumberFormatException e) {
-            return;
+            System.err.println("Porta non valida nel .env, uso default 8080");
         }
 
         Gson gson = new Gson();
@@ -34,33 +36,32 @@ public class Main {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
             
+            ConsoleUtil.clear();
             System.out.print("Username: ");
             String usernameInput = scanner.nextLine();
             
             Login loginDto = new Login(usernameInput);
             output.writeUTF(gson.toJson(loginDto));
 
-            String confirmedArea = input.readUTF();
+            String serverResponse = input.readUTF();
+            String finalArea;
 
-            if (confirmedArea.equals("NEED_AREA")) {
-                String areaList = input.readUTF();
-                System.out.println(areaList);
-                
+            if (serverResponse.contains("{") || serverResponse.contains("[")) {
+                ConsoleUtil.clear();
+                System.out.println("Seleziona area tra:\n" + serverResponse);
                 System.out.print("Area: ");
-                String selectedArea = scanner.nextLine();
+                finalArea = scanner.nextLine();
                 
-                Area areaDto = new Area(selectedArea);
+                Area areaDto = new Area(finalArea);
                 output.writeUTF(gson.toJson(areaDto));
-                
-                confirmedArea = input.readUTF();
+            } else {
+                finalArea = serverResponse;
             }
 
-            Storage storage = new Storage();
-            storage.setUserName(usernameInput);
-            storage.setUserArea(confirmedArea);
+            Storage storage = new Storage(usernameInput, finalArea);
 
-            Reciever receiver = new Reciever(storage);
-            Sender sender = new Sender(storage);
+            Receiver receiver = new Receiver(storage, socket);
+            Sender sender = new Sender(storage, socket);
             KeyboardManager keyboardManager = new KeyboardManager(storage);
 
             receiver.start();
