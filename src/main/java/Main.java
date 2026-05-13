@@ -59,9 +59,9 @@ public class Main {
             storage.setUserName(usernameInput);
             storage.setUserArea(confirmedArea);
 
-            Reciever receiver = new Reciever();
-            Sender sender = new Sender();
-            KeyboardManager keyboardManager = new KeyboardManager();
+            Reciever receiver = new Reciever(storage);
+            Sender sender = new Sender(storage);
+            KeyboardManager keyboardManager = new KeyboardManager(storage);
 
             receiver.start();
             sender.start();
