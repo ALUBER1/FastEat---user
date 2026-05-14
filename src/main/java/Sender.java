@@ -2,7 +2,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import com.google.gson.Gson;
-import models.dto.Update;
 
 public class Sender extends Thread {
     private final Storage storage;
@@ -20,19 +19,19 @@ public class Sender extends Thread {
         try {
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
-            while (!isInterrupted()) {
+            while (storage.isRunning()) {
                 synchronized (storage) {
-                    storage.wait();
-                    
-                    Update update = new Update(
-                        storage.getUserName(),
-                        storage.getUserArea(),
-                        storage.getLabel(),
-                        storage.getCommand()
-                    );
+                    while (storage.isRunning() && !storage.hasMessages()) {
+                        storage.wait();
+                    }
 
-                    output.writeUTF(gson.toJson(update));
-                    output.flush();
+                    if (!storage.isRunning()) break;
+
+                    Object message = storage.fetchMessage();
+                    if (message != null) {
+                        output.writeUTF(gson.toJson(message));
+                        output.flush();
+                    }
                 }
             }
         } catch (IOException | InterruptedException e) {
