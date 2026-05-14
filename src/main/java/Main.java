@@ -15,17 +15,14 @@ public class Main {
         String serverUrl = dotenv.get("SERVER_URL");
         String portStr = dotenv.get("PORT");
 
-        int port = 8080; 
-        if (serverUrl == null || serverUrl.isEmpty()) {
-            serverUrl = "localhost";
+        if (serverUrl == null || portStr == null || serverUrl.isEmpty()) {
+            throw new RuntimeException("Inserire dati corretti nel file .env: SERVER_URL o PORT mancanti");
         }
-        
+        int port;
         try {
-            if (portStr != null) {
-                port = Integer.parseInt(portStr);
-            }
+            port = Integer.parseInt(portStr);
         } catch (NumberFormatException e) {
-            System.err.println("Porta non valida nel .env, uso default 8080");
+            throw new RuntimeException("Inserire dati corretti nel file .env: PORT deve essere un numero");
         }
 
         Gson gson = new Gson();
@@ -34,28 +31,36 @@ public class Main {
         try (Socket socket = new Socket(serverUrl, port)) {
             
             DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            DataOutputStream documentOutput = new DataOutputStream(socket.getOutputStream());
             
-            ConsoleUtil.clear();
-            System.out.print("Username: ");
-            String usernameInput = scanner.nextLine();
+            Util.clear();
+            String usernameInput = "";
+            while (usernameInput.trim().isEmpty()) {
+                System.out.print("Username: ");
+                usernameInput = scanner.nextLine();
+            }
             
             Login loginDto = new Login(usernameInput);
-            output.writeUTF(gson.toJson(loginDto));
+            documentOutput.writeUTF(gson.toJson(loginDto));
 
             String serverResponse = input.readUTF();
             String finalArea;
 
-            if (serverResponse.contains("{") || serverResponse.contains("[")) {
-                ConsoleUtil.clear();
-                System.out.println("Seleziona area tra:\n" + serverResponse);
-                System.out.print("Area: ");
-                finalArea = scanner.nextLine();
+            if (!serverResponse.equalsIgnoreCase("OK")) {
+                Util.clear();
+                System.out.println("Aree disponibili:\n" + serverResponse);
                 
-                Area areaDto = new Area(finalArea);
-                output.writeUTF(gson.toJson(areaDto));
+                String selectedArea = "";
+                while (selectedArea.trim().isEmpty()) {
+                    System.out.print("Area: ");
+                    selectedArea = scanner.nextLine();
+                }
+                
+                Area areaDto = new Area(selectedArea);
+                documentOutput.writeUTF(gson.toJson(areaDto));
+                finalArea = selectedArea;
             } else {
-                finalArea = serverResponse;
+                finalArea = "Default"; 
             }
 
             Storage storage = new Storage(usernameInput, finalArea);
@@ -74,6 +79,8 @@ public class Main {
 
         } catch (IOException | InterruptedException e) {
             System.err.println("Errore: " + e.getMessage());
+        } finally {
+            scanner.close();
         }
     }
 }
