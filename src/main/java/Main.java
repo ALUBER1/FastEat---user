@@ -7,6 +7,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.Gson;
 import models.dto.Login;
 import models.dto.Area;
+import models.dto.AvailableAreas;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,6 +19,7 @@ public class Main {
         if (serverUrl == null || portStr == null || serverUrl.isEmpty()) {
             throw new RuntimeException("Inserire dati corretti nel file .env: SERVER_URL o PORT mancanti");
         }
+
         int port;
         try {
             port = Integer.parseInt(portStr);
@@ -31,37 +33,41 @@ public class Main {
         try (Socket socket = new Socket(serverUrl, port)) {
             
             DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream documentOutput = new DataOutputStream(socket.getOutputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
             
-            Util.clear();
             String usernameInput = "";
             while (usernameInput.trim().isEmpty()) {
                 System.out.print("Username: ");
                 usernameInput = scanner.nextLine();
+                Util.clear();
             }
             
             Login loginDto = new Login(usernameInput);
-            documentOutput.writeUTF(gson.toJson(loginDto));
+            output.writeUTF(gson.toJson(loginDto));
+            output.flush();
 
             String serverResponse = input.readUTF();
-            String finalArea;
+            AvailableAreas available = gson.fromJson(serverResponse, AvailableAreas.class);
 
-            if (!serverResponse.equalsIgnoreCase("OK")) {
+            String finalArea = "";
+            boolean valid = false;
+
+            while (!valid) {
+                System.out.println("Aree: " + available.getAreas());
+                System.out.print("Area: ");
+                finalArea = scanner.nextLine();
                 Util.clear();
-                System.out.println("Aree disponibili:\n" + serverResponse);
-                
-                String selectedArea = "";
-                while (selectedArea.trim().isEmpty()) {
-                    System.out.print("Area: ");
-                    selectedArea = scanner.nextLine();
+
+                if (available.getAreas().contains(finalArea)) {
+                    valid = true;
+                } else {
+                    System.out.println("Area non valida.");
                 }
-                
-                Area areaDto = new Area(selectedArea);
-                documentOutput.writeUTF(gson.toJson(areaDto));
-                finalArea = selectedArea;
-            } else {
-                finalArea = "Default"; 
             }
+
+            Area areaDto = new Area(finalArea);
+            output.writeUTF(gson.toJson(areaDto));
+            output.flush();
 
             Storage storage = new Storage(usernameInput, finalArea);
 
