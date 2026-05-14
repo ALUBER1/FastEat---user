@@ -1,10 +1,12 @@
 import java.util.Vector;
 
+import models.dto.OrdineRequestDto;
 import models.dto.Prodotto;
 
 public class Storage {
     private boolean isRunning = true;
     private OrderStates state;
+    private Vector<Object> toSend;
 
     public synchronized boolean running() {
         return isRunning;
@@ -22,8 +24,12 @@ public class Storage {
         this.state = state;
     }
 
-    public synchronized void addProducts(Vector<Prodotto> prodotti) {
-        
+    public synchronized void addToSend(Object o) {
+        toSend.add(o);
+    }
+
+    public synchronized Vector<Object> getToSend() {
+        return toSend;
     }
 }
 

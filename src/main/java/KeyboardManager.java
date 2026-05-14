@@ -1,6 +1,7 @@
 import java.util.Scanner;
 import java.util.Vector;
 
+import models.dto.OrdineRequestDto;
 import models.dto.Prodotto;
 
 public class KeyboardManager extends Thread {
@@ -31,6 +32,10 @@ public class KeyboardManager extends Thread {
                         continue;
                     }
                     Util.clearConsole();
+                    if (input.equals("done")) {
+                        s.changeState(OrderStates.ORDERED);
+                        continue;
+                    }
                     System.out.println("inserisci la quantità");
                     String quantitaS = "";
                     while (!quantitaS.matches("\\d+")) {
@@ -44,11 +49,9 @@ public class KeyboardManager extends Thread {
                     }
                     prodotti.add(new Prodotto(input, Integer.parseInt(quantitaS)));
                 }
-                s.changeState(OrderStates.ORDERED);
-                s.addProducts(prodotti);
+                s.addToSend(new OrdineRequestDto(prodotti));
             } else if(input.equals("2")) {
                 s.stop();
-                continue;
             } else {
                 Util.errorMessage("input non riconosciuto");
                 scanner.nextLine();
