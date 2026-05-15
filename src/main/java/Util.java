@@ -1,5 +1,3 @@
-import java.io.IOException;
-
 public class Util {
     public static void errorMessage(String msg) {
         System.out.println(msg);

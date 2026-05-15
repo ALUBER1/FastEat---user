@@ -49,27 +49,31 @@ public class Main {
             String serverResponse = input.readUTF();
             AvailableAreas available = gson.fromJson(serverResponse, AvailableAreas.class);
 
-            String finalArea = "";
-            boolean valid = false;
+            String finalAreaName = "";
 
-            while (!valid) {
-                System.out.println("Aree: " + available.getAreas());
-                System.out.print("Area: ");
-                finalArea = scanner.nextLine();
-                Util.clear();
+            if (available.getAreas() != null && !available.getAreas().isEmpty()) {
+                boolean valid = false;
+                while (!valid) {
+                    System.out.println("Aree: " + available.getAreas());
+                    System.out.print("Area: ");
+                    finalAreaName = scanner.nextLine();
+                    Util.clear();
 
-                if (available.getAreas().contains(finalArea)) {
-                    valid = true;
-                } else {
-                    System.out.println("Area non valida.");
+                    if (available.getAreas().contains(finalAreaName)) {
+                        valid = true;
+                    } else {
+                        System.out.println("Area non valida.");
+                    }
                 }
+                
+                Area areaDto = new Area(finalAreaName);
+                output.writeUTF(gson.toJson(areaDto));
+                output.flush();
+            } else {
+                finalAreaName = "Pre-set";
             }
 
-            Area areaDto = new Area(finalArea);
-            output.writeUTF(gson.toJson(areaDto));
-            output.flush();
-
-            Storage storage = new Storage(usernameInput, finalArea);
+            Storage storage = new Storage(usernameInput, finalAreaName);
 
             Receiver receiver = new Receiver(storage, socket);
             Sender sender = new Sender(storage, socket);
