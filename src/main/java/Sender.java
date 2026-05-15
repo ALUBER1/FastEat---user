@@ -1,6 +1,7 @@
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Vector;
 import com.google.gson.Gson;
 
 public class Sender extends Thread {
@@ -20,21 +21,14 @@ public class Sender extends Thread {
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
             while (storage.isRunning()) {
-                synchronized (storage) {
-                    while (storage.isRunning() && !storage.hasMessages()) {
-                        storage.wait();
-                    }
+                Vector<Object> messages = storage.fetchMessages();
 
-                    if (!storage.isRunning()) break;
-
-                    Object message = storage.fetchMessage();
-                    if (message != null) {
-                        output.writeUTF(gson.toJson(message));
-                        output.flush();
-                    }
+                for (Object message : messages) {
+                    output.writeUTF(gson.toJson(message));
+                    output.flush();
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             System.err.println("Errore: " + e.getMessage());
         }
     }
