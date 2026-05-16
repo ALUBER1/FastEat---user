@@ -3,8 +3,8 @@ import java.util.Vector;
 public class Storage {
     private boolean isRunning = true;
     private OrderStates state = OrderStates.INMENU;
-    private Vector<Object> toSend;
-    private Vector<String> messages;
+    private Vector<Object> toSend = new Vector<>();
+    private Vector<String> messages = new Vector<>();
     private String currentMenu;
 
     public synchronized boolean running() {
@@ -50,6 +50,7 @@ public class Storage {
     }
 
     public synchronized void writeMenu(String menu) {
+        System.out.print(menu);
         this.currentMenu = menu;
     }
 
@@ -57,5 +58,3 @@ public class Storage {
         return currentMenu;
     }
 }
-
-

@@ -17,16 +17,18 @@ public class KeyboardManager extends Thread {
         
         while (s.running()) {
             s.changeState(OrderStates.INMENU);
+            s.writeMenu("[1] ordina\n[2] esci\ninput: ");
             String input = scanner.nextLine();
-            
+
             if (input.equals("1")) {
                 s.changeState(OrderStates.ORDERING);
                 Vector<Prodotto> prodotti = new Vector<>();
 
                 while (s.getState().equals(OrderStates.ORDERING)) {
-                    System.out.println("scrivi il nome del prodotto da ordinare (done per finire ordine)");
+                    s.writeMenu("scrivi il nome del prodotto da ordinare (done per finire ordine)\n");
+
                     input = scanner.nextLine();
-                    if (!input.matches("[a-zA-Z]+")) {
+                    if (!input.matches("[a-zA-Z\\s\\-]+")) {
                         Util.errorMessage("inserisci solo caratteri dell'alfabeto");
                         scanner.nextLine();
                         continue;
@@ -36,7 +38,7 @@ public class KeyboardManager extends Thread {
                         s.changeState(OrderStates.ORDERED);
                         continue;
                     }
-                    System.out.println("inserisci la quantità");
+                    s.writeMenu("inserisci la quantità\n");
                     String quantitaS = "";
                     while (!quantitaS.matches("\\d+")) {
                         quantitaS = scanner.nextLine();
