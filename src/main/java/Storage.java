@@ -1,12 +1,11 @@
 import java.util.Vector;
 
-import models.dto.OrdineRequestDto;
-import models.dto.Prodotto;
-
 public class Storage {
     private boolean isRunning = true;
-    private OrderStates state;
+    private OrderStates state = OrderStates.INMENU;
     private Vector<Object> toSend;
+    private Vector<String> messages;
+    private String currentMenu;
 
     public synchronized boolean running() {
         return isRunning;
@@ -26,10 +25,36 @@ public class Storage {
 
     public synchronized void addToSend(Object o) {
         toSend.add(o);
+        this.notify();
     }
 
     public synchronized Vector<Object> getToSend() {
-        return toSend;
+        while (isRunning && toSend.isEmpty()) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Vector<Object> toReturn = new Vector<>(toSend);
+        toSend.clear();
+        return toReturn;
+    }
+
+    public synchronized Vector<String> getMessages() {
+        return messages;
+    }
+
+    public synchronized void addMessage(String message) {
+        messages.add(message);
+    }
+
+    public synchronized void writeMenu(String menu) {
+        this.currentMenu = menu;
+    }
+
+    public synchronized String getMenu() {
+        return currentMenu;
     }
 }
 
