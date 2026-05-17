@@ -10,10 +10,6 @@ public class KeyboardManager extends Thread {
     public KeyboardManager(Storage s) {
         this.s = s;
     }
-    
-    public KeyboardManager(Storage storage) {
-        s = storage;
-    }
 
     @Override
     public void run() {

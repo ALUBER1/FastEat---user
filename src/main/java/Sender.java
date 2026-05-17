@@ -9,20 +9,15 @@ import com.google.gson.Gson;
 public class Sender extends Thread {
     private final Storage storage;
     private final Socket socket;
-    private final Gson gson;
 
     public Sender(Storage storage, Socket socket) {
         this.storage = storage;
         this.socket = socket;
-        this.gson = new Gson();
-    }
-
-    public Sender(Storage storage, Socket socket) {
-        s = storage;
     }
 
     @Override
     public void run() {
+        Gson gson = new Gson();
         try {
             OutputStream ostream = socket.getOutputStream();
             BufferedOutputStream writer = new BufferedOutputStream(ostream);
