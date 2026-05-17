@@ -1,15 +1,13 @@
 package models.dto;
 
-import java.util.Vector;
-
 public class AreasDisponibiliDto {
 
     private int statusCode;
-    private Vector<AreaDto> areas;
+    private AreaDto[] areas;
 
     public AreasDisponibiliDto(
             int statusCode,
-            Vector<AreaDto> areas
+            AreaDto[] areas
     ) {
         this.statusCode = statusCode;
         this.areas = areas;
@@ -19,7 +17,7 @@ public class AreasDisponibiliDto {
         return statusCode;
     }
 
-    public Vector<AreaDto> getAreas() {
+    public AreaDto[] getAreas() {
         return areas;
     }
 }

@@ -13,6 +13,7 @@ public class Storage {
 
     public synchronized void stop() {
         isRunning = false;
+        notifyAll();
     }
 
     public synchronized OrderStates getState() {
