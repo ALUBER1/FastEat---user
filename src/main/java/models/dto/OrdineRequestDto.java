@@ -8,9 +8,9 @@ public class OrdineRequestDto {
     public OrdineRequestDto(Vector<Prodotto> prodotti) {
         for (Prodotto prodotto : prodotti) {
             if (dettaglio.isEmpty())
-                dettaglio = prodotto.quantita + " x " + prodotto.nome;
+                dettaglio = prodotto.quantita + " x " + prodotto.getNome();
             else
-                dettaglio = dettaglio.concat(",\n" + prodotto.quantita + " x " + prodotto.nome);
+                dettaglio = dettaglio.concat(",\n" + prodotto.getQuantita() + " x " + prodotto.getNome());
         }
     }
 

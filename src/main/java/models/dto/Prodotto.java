@@ -9,4 +9,12 @@ public class Prodotto implements Serializable {
         this.nome = nome;
         this.quantita = quantita;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public int getQuantita() {
+        return quantita;
+    }
 }
