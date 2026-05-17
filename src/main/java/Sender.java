@@ -1,6 +1,8 @@
-import java.io.DataOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 import com.google.gson.Gson;
 
@@ -18,14 +20,16 @@ public class Sender extends Thread {
     @Override
     public void run() {
         try {
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            OutputStream ostream = socket.getOutputStream();
+            BufferedOutputStream writer = new BufferedOutputStream(ostream);
 
-            while (storage.isRunning()) {
-                Vector<Object> messages = storage.fetchMessages();
+            while (storage.running()) {
+                Vector<Object> messages = storage.getToSend();
 
                 for (Object message : messages) {
-                    output.writeUTF(gson.toJson(message));
-                    output.flush();
+                    String json = gson.toJson(message) + "\n";
+                    writer.write(json.getBytes(StandardCharsets.UTF_8));
+                    writer.flush();
                 }
             }
         } catch (IOException e) {
