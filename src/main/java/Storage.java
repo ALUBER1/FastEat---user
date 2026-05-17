@@ -1,6 +1,5 @@
 import java.util.Vector;
 
-import models.dto.Area;
 import models.dto.AreaDto;
 
 public class Storage {
@@ -10,7 +9,12 @@ public class Storage {
     private Vector<String> messages = new Vector<>();
     private String currentMenu;
 
+    private String username;
+    private AreaDto selectedArea;
+
     public Storage(String username, AreaDto selectedArea) {
+        this.username = username;
+        this.selectedArea = selectedArea;
     }
 
     public synchronized boolean running() {
@@ -32,7 +36,7 @@ public class Storage {
 
     public synchronized void addToSend(Object o) {
         toSend.add(o);
-        this.notify();
+        this.notifyAll();
     }
 
     public synchronized Vector<Object> getToSend() {
