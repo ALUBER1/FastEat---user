@@ -12,12 +12,11 @@ public class Receiver extends Thread {
 
     private final Storage storage;
     private final Socket socket;
-    private final Gson gson;
+
 
     public Receiver(Storage storage, Socket socket) {
         this.storage = storage;
         this.socket = socket;
-        this.gson = new Gson();
     }
 
     @Override
@@ -35,7 +34,7 @@ public class Receiver extends Thread {
             while (storage.running()) {
 
                 String json = reader.readLine();
-
+                Gson gson = new Gson();
                 InsertResponseDto message = gson.fromJson(json, InsertResponseDto.class);
 
                 storage.addMessage(message.getMsg());

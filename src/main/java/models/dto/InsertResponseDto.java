@@ -21,11 +21,4 @@ public class InsertResponseDto {
         return msg;
     }
 
-    public static InsertResponseDto success(String msg) {
-        return new InsertResponseDto(200, msg);
-    }
-
-    public static InsertResponseDto error(String msg) {
-        return new InsertResponseDto(500, msg);
-    }
 }
