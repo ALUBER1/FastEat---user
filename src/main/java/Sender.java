@@ -30,6 +30,8 @@ public class Sender extends Thread {
                     String json = gson.toJson(message) + "\n";
                     writer.write(json.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
+                    if (message.equals("!disconnect!"))
+                        storage.stop();
                 }
             }
         } catch (IOException e) {
