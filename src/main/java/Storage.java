@@ -1,6 +1,7 @@
 import java.util.Vector;
 
 import models.dto.Area;
+import models.dto.AreaDto;
 
 public class Storage {
     private boolean isRunning = true;
@@ -9,7 +10,7 @@ public class Storage {
     private Vector<String> messages = new Vector<>();
     private String currentMenu;
 
-    public Storage(String username, Area selectedArea) {
+    public Storage(String username, AreaDto selectedArea) {
     }
 
     public synchronized boolean running() {

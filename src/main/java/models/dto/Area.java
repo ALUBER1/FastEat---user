@@ -10,4 +10,8 @@ public class Area {
     public String getAreaName() {
         return areaName;
     }
+
+    public String toMenu(int index) {
+        return "[" + index + "] " + areaName;
+    }
 }

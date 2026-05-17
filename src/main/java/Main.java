@@ -45,26 +45,33 @@ public class Main {
             writer.write(loginJson.getBytes(StandardCharsets.UTF_8));
             writer.flush();
 
-            Area selectedArea = null;
+            AreaDto selectedArea = null;
             if (reader.hasNextLine()) {
                 String response = reader.nextLine();
-                AvailableAreas available = gson.fromJson(response, AvailableAreas.class);
+                AreasDisponibiliDto available = gson.fromJson(response, AreasDisponibiliDto.class);
 
-                if (available.getAreas() != null && !available.getAreas().isEmpty()) {
-                    Area[] areaArray = available.getAreas().toArray(new Area[0]);
+                if (available != null && available.getAreas() != null && available.getAreas().length > 0) {
+                    AreaDto[] areaArray = available.getAreas();
                     int choice = -1;
 
                     while (choice < 0 || choice >= areaArray.length) {
                         System.out.println("Seleziona la tua zona:");
                         for (int i = 0; i < areaArray.length; i++) {
-                            System.out.println("[" + i + "] " + areaArray[i].getAreaName());
+                            System.out.println(areaArray[i].toMenu(i));
                         }
                         System.out.print("Scelta: ");
                         String input = scanner.nextLine();
                         Util.clearConsole();
 
-                        if (input.matches("\\d+")) {
-                            choice = Integer.parseInt(input);
+                        if (input.matches("^\\d+$")) {
+                            int tempChoice = Integer.parseInt(input);
+                            if (tempChoice >= 0 && tempChoice < areaArray.length) {
+                                choice = tempChoice;
+                            } else {
+                                System.out.println("Indice non valido.");
+                            }
+                        } else {
+                            System.out.println("Inserire solo numeri.");
                         }
                     }
                     
