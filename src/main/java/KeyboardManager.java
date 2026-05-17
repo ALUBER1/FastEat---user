@@ -11,6 +11,10 @@ public class KeyboardManager extends Thread {
         this.s = s;
     }
     
+    public KeyboardManager(Storage storage) {
+        s = storage;
+    }
+
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
