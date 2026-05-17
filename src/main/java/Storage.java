@@ -1,11 +1,16 @@
 import java.util.Vector;
 
+import models.dto.Area;
+
 public class Storage {
     private boolean isRunning = true;
     private OrderStates state = OrderStates.INMENU;
     private Vector<Object> toSend = new Vector<>();
     private Vector<String> messages = new Vector<>();
     private String currentMenu;
+
+    public Storage(String username, Area selectedArea) {
+    }
 
     public synchronized boolean running() {
         return isRunning;

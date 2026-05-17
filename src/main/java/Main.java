@@ -1,22 +1,18 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.Gson;
-import models.dto.Login;
-import models.dto.Area;
-import models.dto.AvailableAreas;
+import models.dto.*;
 
 public class Main {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
-        
-        String serverUrl = dotenv.get("SERVER_URL");
+        String hostname = dotenv.get("SERVER_URL");
         String portStr = dotenv.get("PORT");
 
-        if (serverUrl == null || portStr == null || serverUrl.isEmpty()) {
+        if (hostname == null || portStr == null || hostname.isEmpty()) {
             throw new RuntimeException("Inserire dati corretti nel file .env: SERVER_URL o PORT mancanti");
         }
 
@@ -30,50 +26,56 @@ public class Main {
         Gson gson = new Gson();
         Scanner scanner = new Scanner(System.in);
 
-        try (Socket socket = new Socket(serverUrl, port)) {
+        try {
+            Socket socket = new Socket(hostname, port);
             
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-            
-            String usernameInput = "";
-            while (usernameInput.trim().isEmpty()) {
+            InputStream istream = socket.getInputStream();
+            Scanner reader = new Scanner(istream);
+            OutputStream ostream = socket.getOutputStream();
+            BufferedOutputStream writer = new BufferedOutputStream(ostream);
+
+            String username = "";
+            while (username.trim().isEmpty()) {
                 System.out.print("Username: ");
-                usernameInput = scanner.nextLine();
-                Util.clear();
+                username = scanner.nextLine();
+                Util.clearConsole();
             }
-            
-            Login loginDto = new Login(usernameInput);
-            output.writeUTF(gson.toJson(loginDto));
-            output.flush();
 
-            String serverResponse = input.readUTF();
-            AvailableAreas available = gson.fromJson(serverResponse, AvailableAreas.class);
+            String loginJson = gson.toJson(new Login(username)) + "\n";
+            writer.write(loginJson.getBytes(StandardCharsets.UTF_8));
+            writer.flush();
 
-            String finalAreaName = "";
+            Area selectedArea = null;
+            if (reader.hasNextLine()) {
+                String response = reader.nextLine();
+                AvailableAreas available = gson.fromJson(response, AvailableAreas.class);
 
-            if (available.getAreas() != null && !available.getAreas().isEmpty()) {
-                boolean valid = false;
-                while (!valid) {
-                    System.out.println("Aree: " + available.getAreas());
-                    System.out.print("Area: ");
-                    finalAreaName = scanner.nextLine();
-                    Util.clear();
+                if (available.getAreas() != null && !available.getAreas().isEmpty()) {
+                    Area[] areaArray = available.getAreas().toArray(new Area[0]);
+                    int choice = -1;
 
-                    if (available.getAreas().contains(finalAreaName)) {
-                        valid = true;
-                    } else {
-                        System.out.println("Area non valida.");
+                    while (choice < 0 || choice >= areaArray.length) {
+                        System.out.println("Seleziona la tua zona:");
+                        for (int i = 0; i < areaArray.length; i++) {
+                            System.out.println("[" + i + "] " + areaArray[i].getAreaName());
+                        }
+                        System.out.print("Scelta: ");
+                        String input = scanner.nextLine();
+                        Util.clearConsole();
+
+                        if (input.matches("\\d+")) {
+                            choice = Integer.parseInt(input);
+                        }
                     }
+                    
+                    selectedArea = areaArray[choice];
+                    String areaJson = gson.toJson(selectedArea) + "\n";
+                    writer.write(areaJson.getBytes(StandardCharsets.UTF_8));
+                    writer.flush();
                 }
-                
-                Area areaDto = new Area(finalAreaName);
-                output.writeUTF(gson.toJson(areaDto));
-                output.flush();
-            } else {
-                finalAreaName = "Pre-set";
             }
 
-            Storage storage = new Storage(usernameInput, finalAreaName);
+            Storage storage = new Storage(username, selectedArea);
 
             Receiver receiver = new Receiver(storage, socket);
             Sender sender = new Sender(storage, socket);
@@ -88,7 +90,7 @@ public class Main {
             keyboardManager.join();
 
         } catch (IOException | InterruptedException e) {
-            System.err.println("Errore: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             scanner.close();
         }
