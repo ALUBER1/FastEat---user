@@ -41,7 +41,7 @@ public class Main {
                 Util.clearConsole();
             }
 
-            String loginJson = gson.toJson(new Login(username)) + "\n";
+            String loginJson = gson.toJson(new LoginDto(username)) + "\n";
             writer.write(loginJson.getBytes(StandardCharsets.UTF_8));
             writer.flush();
 
