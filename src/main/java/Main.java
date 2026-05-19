@@ -4,7 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.Gson;
-import models.dto.*;
+import models.Area;
+import models.dto.AreaDto;
+import models.dto.AreaSenderDto;
+import models.dto.AreasDisponibiliDto;
+import models.dto.LoginDto;
 
 public class Main {
     public static void main(String[] args) {
@@ -74,9 +78,11 @@ public class Main {
                             System.out.println("Inserire solo numeri.");
                         }
                     }
-                    
+                    Area areaScelta = new Area(areaArray[choice].getId(),areaArray[choice].getNome(),areaArray[choice].getIp());
+                    AreaSenderDto areaSceltaInvio = new AreaSenderDto(areaScelta);
+
                     selectedArea = areaArray[choice];
-                    String areaJson = gson.toJson(selectedArea) + "\n";
+                    String areaJson = gson.toJson(areaSceltaInvio) + "\n";
                     writer.write(areaJson.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
                 }

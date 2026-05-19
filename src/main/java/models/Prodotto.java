@@ -1,4 +1,4 @@
-package models.dto;
+package models;
 import java.io.Serializable;
 
 public class Prodotto implements Serializable {

@@ -1,6 +1,6 @@
 package models.dto;
 
-import java.util.List;
+import models.Area;
 
 public class AvailableAreas {
     private Area[] areas;

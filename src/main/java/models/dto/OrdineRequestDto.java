@@ -1,5 +1,7 @@
 package models.dto;
 
+import models.Prodotto;
+
 import java.util.Vector;
 
 public class OrdineRequestDto {
@@ -8,7 +10,7 @@ public class OrdineRequestDto {
     public OrdineRequestDto(Vector<Prodotto> prodotti) {
         for (Prodotto prodotto : prodotti) {
             if (dettaglio.isEmpty())
-                dettaglio = prodotto.quantita + " x " + prodotto.getNome();
+                dettaglio = prodotto.getQuantita() + " x " + prodotto.getNome();
             else
                 dettaglio = dettaglio.concat(",\n" + prodotto.getQuantita() + " x " + prodotto.getNome());
         }

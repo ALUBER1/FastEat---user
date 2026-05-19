@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.util.Vector;
 
 import models.dto.OrdineRequestDto;
-import models.dto.Prodotto;
+import models.Prodotto;
 
 public class KeyboardManager extends Thread {
     Storage s;
