@@ -5,10 +5,7 @@ import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.Gson;
 import models.Area;
-import models.dto.AreaDto;
-import models.dto.AreaSenderDto;
-import models.dto.AreasDisponibiliDto;
-import models.dto.LoginDto;
+import models.dto.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -86,7 +83,12 @@ public class Main {
                     writer.write(areaJson.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
                 }
+            }else{
+                String rispostaName =reader.nextLine();
+                UserResponseDto nomeUser = gson.fromJson(rispostaName, UserResponseDto.class);
+                selectedArea.setId(nomeUser.getUtente().getZona_id());
             }
+
 
             Storage storage = new Storage(username, selectedArea);
 
