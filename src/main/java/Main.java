@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import io.github.cdimascio.dotenv.Dotenv;
 import com.google.gson.Gson;
+import models.Area;
 import models.dto.*;
 
 public class Main {
@@ -41,7 +42,7 @@ public class Main {
                 Util.clearConsole();
             }
 
-            String loginJson = gson.toJson(new Login(username)) + "\n";
+            String loginJson = gson.toJson(new LoginDto(username)) + "\n";
             writer.write(loginJson.getBytes(StandardCharsets.UTF_8));
             writer.flush();
 
@@ -74,13 +75,20 @@ public class Main {
                             System.out.println("Inserire solo numeri.");
                         }
                     }
-                    
+                    Area areaScelta = new Area(areaArray[choice].getId(),areaArray[choice].getNome(),areaArray[choice].getIp());
+                    AreaSenderDto areaSceltaInvio = new AreaSenderDto(areaScelta);
+
                     selectedArea = areaArray[choice];
-                    String areaJson = gson.toJson(selectedArea) + "\n";
+                    String areaJson = gson.toJson(areaSceltaInvio) + "\n";
                     writer.write(areaJson.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
                 }
+            }else{
+                String rispostaName =reader.nextLine();
+                UserResponseDto nomeUser = gson.fromJson(rispostaName, UserResponseDto.class);
+                selectedArea.setId(nomeUser.getUtente().getZona_id());
             }
+
 
             Storage storage = new Storage(username, selectedArea);
 

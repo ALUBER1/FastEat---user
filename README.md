@@ -10,7 +10,7 @@ Mentre invece per l'invio di ordine il flusso e' il seguente:<br/>
 <br/>
 ## ESEMPI DI JSON
 L'app per comunicare usa messaggi con un body json che dal server contengono anche un codice che puo' specificare informazioni in piu' come errori del server.<br/>
-Un esempio di un json del [login](src/main/java/models/dto/LoginDto.java) potrebbe essere:
+Un esempio di un json del [login](src/main/java/models/LoginDto.java) potrebbe essere:
 ```json
 {
     "username": "test",
@@ -18,7 +18,7 @@ Un esempio di un json del [login](src/main/java/models/dto/LoginDto.java) potreb
 }
 ```
 dove lo username specifica il nome utente inserito dall'utente e il type specifica se e' uno user o un rider.<br/>
-Un altro tipo di messaggio inviato dall'utente e' [OrdineRequestDto](src/main/java/models/dto/OrdineRequestDto.java), ad esempio:<br/>
+Un altro tipo di messaggio inviato dall'utente e' [OrdineRequestDto](src/main/java/models/OrdineRequestDto.java), ad esempio:<br/>
 ```json
 {
     "descrizione": "2 x pasta,\n3 x pizza"

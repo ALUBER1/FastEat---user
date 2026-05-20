@@ -26,10 +26,10 @@ public class Sender extends Thread {
                 Vector<Object> messages = storage.getToSend();
 
                 for (Object message : messages) {
-                    String json = gson.toJson(message) + "\n";
-                    writer.write(json.getBytes(StandardCharsets.UTF_8));
+                    String ordine = gson.toJson(message) + "\n";
+                    writer.write(ordine.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
-                    if (message.equals("!disconnect!"))
+                    if (message.equals("\"!disconnect!\""))
                         storage.stop();
                 }
             }

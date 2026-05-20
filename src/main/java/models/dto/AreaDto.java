@@ -18,4 +18,16 @@ public class AreaDto {
     public String toMenu(int index) {
         return "[" + index + "] " + nome;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 }
