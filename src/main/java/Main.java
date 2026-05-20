@@ -27,9 +27,7 @@ public class Main {
         Gson gson = new Gson();
         Scanner scanner = new Scanner(System.in);
 
-        try {
-            Socket socket = new Socket(hostname, port);
-            
+        try(Socket socket = new Socket(hostname, port)) {
             InputStream istream = socket.getInputStream();
             Scanner reader = new Scanner(istream);
             OutputStream ostream = socket.getOutputStream();
@@ -39,20 +37,22 @@ public class Main {
             while (username.trim().isEmpty()) {
                 System.out.print("Username: ");
                 username = scanner.nextLine();
-                Util.clearConsole();
+                if (username.trim().isEmpty())
+                    Util.errorMessage("non inserire username vuoti");
             }
+            Util.clearConsole();
 
             String loginJson = gson.toJson(new LoginDto(username)) + "\n";
             writer.write(loginJson.getBytes(StandardCharsets.UTF_8));
             writer.flush();
 
-            AreaDto selectedArea = null;
-            if (reader.hasNextLine()) {
-                String response = reader.nextLine();
-                AreasDisponibiliDto available = gson.fromJson(response, AreasDisponibiliDto.class);
+            Area selectedArea = null;
+            String response = reader.nextLine();
+            AreasDisponibiliDto available = gson.fromJson(response, AreasDisponibiliDto.class);
+            if (available.getStatusCode() == 200) {
 
                 if (available != null && available.getAreas() != null && available.getAreas().length > 0) {
-                    AreaDto[] areaArray = available.getAreas();
+                    Area[] areaArray = available.getAreas();
                     int choice = -1;
 
                     while (choice < 0 || choice >= areaArray.length) {
@@ -75,20 +75,16 @@ public class Main {
                             System.out.println("Inserire solo numeri.");
                         }
                     }
-                    Area areaScelta = new Area(areaArray[choice].getId(),areaArray[choice].getNome(),areaArray[choice].getIp());
-                    AreaSenderDto areaSceltaInvio = new AreaSenderDto(areaScelta);
-
+                    
                     selectedArea = areaArray[choice];
-                    String areaJson = gson.toJson(areaSceltaInvio) + "\n";
+                    String areaJson = gson.toJson(new AreaSenderDto(selectedArea)) + "\n";
                     writer.write(areaJson.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
                 }
-            }else{
-                String rispostaName =reader.nextLine();
-                UserResponseDto nomeUser = gson.fromJson(rispostaName, UserResponseDto.class);
-                selectedArea.setId(nomeUser.getUtente().getZona_id());
+            } else if (available.getStatusCode() != 201) {
+                reader.close();
+                throw new RuntimeException("errore nel server");
             }
-
 
             Storage storage = new Storage(username, selectedArea);
 
@@ -103,6 +99,7 @@ public class Main {
             receiver.join();
             sender.join();
             keyboardManager.join();
+            reader.close();
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

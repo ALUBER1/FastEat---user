@@ -35,13 +35,15 @@ public class Receiver extends Thread {
             );
 
             while (storage.running()) {
-
                 String json = reader.readLine();
 
                 InsertResponseDto message =
                         gson.fromJson(json, InsertResponseDto.class);
 
-                storage.addMessage(message.getMsg());
+                if (storage.running())
+                    storage.addMessage(message.getMsg());
+                else
+                    return;
 
                 Util.clearConsole();
 

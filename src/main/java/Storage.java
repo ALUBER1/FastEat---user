@@ -1,6 +1,6 @@
 import java.util.Vector;
 
-import models.dto.AreaDto;
+import models.Area;
 
 public class Storage {
     private boolean isRunning = true;
@@ -10,9 +10,9 @@ public class Storage {
     private String currentMenu;
 
     private String username;
-    private AreaDto selectedArea;
+    private Area selectedArea;
 
-    public Storage(String username, AreaDto selectedArea) {
+    public Storage(String username, Area selectedArea) {
         this.username = username;
         this.selectedArea = selectedArea;
     }
