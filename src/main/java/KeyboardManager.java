@@ -56,6 +56,7 @@ public class KeyboardManager extends Thread {
                 s.addToSend(new OrdineRequestDto(prodotti));
             } else if(input.equals("2")) {
                 s.addToSend("!disconnect!");
+                scanner.close();
                 return;
             } else {
                 Util.errorMessage("input non riconosciuto");

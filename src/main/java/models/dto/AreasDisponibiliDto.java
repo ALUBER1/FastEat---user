@@ -1,13 +1,15 @@
 package models.dto;
 
+import models.Area;
+
 public class AreasDisponibiliDto {
 
     private int statusCode;
-    private AreaDto[] areas;
+    private Area[] areas;
 
     public AreasDisponibiliDto(
             int statusCode,
-            AreaDto[] areas
+            Area[] areas
     ) {
         this.statusCode = statusCode;
         this.areas = areas;
@@ -17,7 +19,7 @@ public class AreasDisponibiliDto {
         return statusCode;
     }
 
-    public AreaDto[] getAreas() {
+    public Area[] getAreas() {
         return areas;
     }
 }

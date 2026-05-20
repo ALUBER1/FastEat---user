@@ -12,7 +12,7 @@ public class OrdineRequestDto {
             if (dettaglio.isEmpty())
                 dettaglio = prodotto.getQuantita() + " x " + prodotto.getNome();
             else
-                dettaglio = dettaglio.concat(",\n" + prodotto.getQuantita() + " x " + prodotto.getNome());
+                dettaglio = dettaglio.concat(", " + prodotto.getQuantita() + " x " + prodotto.getNome());
         }
     }
 

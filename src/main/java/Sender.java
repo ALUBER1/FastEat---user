@@ -29,7 +29,7 @@ public class Sender extends Thread {
                     String ordine = gson.toJson(message) + "\n";
                     writer.write(ordine.getBytes(StandardCharsets.UTF_8));
                     writer.flush();
-                    if (message.equals("\"!disconnect!\""))
+                    if (message.equals("!disconnect!"))
                         storage.stop();
                 }
             }
