@@ -53,7 +53,9 @@ public class KeyboardManager extends Thread {
                     }
                     prodotti.add(new Prodotto(input, Integer.parseInt(quantitaS)));
                 }
-                s.addToSend(new OrdineRequestDto(prodotti));
+                
+                if (prodotti.size() != 0)
+                    s.addToSend(new OrdineRequestDto(prodotti));
             } else if(input.equals("2")) {
                 s.addToSend("!disconnect!");
                 scanner.close();
